@@ -1,17 +1,20 @@
 # Development
 #
-# VERSION   0.0.1
+# VERSION   0.2
 
 # Dockerfile
 
 FROM centos:latest
 
 MAINTAINER Kim Goh <gaojingan@gmail.com>
+LABEL Vendor="CentOS"
+LABEL License=GPLv2
+LABEL Version=0.2
 
-RUN yum -y update
-RUN yum -y clean all
-RUN yum -y install bash-completion curl wget w3m sudo rsync vim git unzip gcc make automake zsh systemd-sysv \
+RUN yum -y update; yum -y clean all
+RUN yum -y --setopt=tsflags=nodocs install bash-completion curl wget w3m sudo rsync vim git unzip gcc make automake zsh systemd-sysv \
     initscripts openssh-server openssh-clients net-tools environment-modules
+RUN yum -y clean all; yum -y erase vim-minimal
 
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
@@ -24,9 +27,7 @@ RUN /bin/sed -i 's/.*session.*required.*pam_loginuid.so.*/session optional pam_l
 RUN /bin/echo -e "LANG=\"en_US.UTF-8\"" > /etc/default/local
 
 RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/"  /etc/ssh/sshd_config
-RUN echo "UsePAM no" >> /etc/ssh/sshd_config
-RUN echo "UseDNS no" >> /etc/ssh/sshd_config
-RUN echo "Port 22" >> /etc/ssh/sshd_config
+RUN echo "UsePAM no" >> /etc/ssh/sshd_config; echo "UseDNS no" >> /etc/ssh/sshd_config; echo "Port 22" >> /etc/ssh/sshd_config
 
 EXPOSE 22 80 443
 ENV container=docker
